@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b62f7d738fa5c4caa45592a6c407aa, type: 3}
+  m_Name: DefaultTraversal
+  m_EditorClassIdentifier: MovementGym.Runtime::Jimmy.Movement.TraversalSettings
+  wallRunEnabled: 1
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  wallReach: 0.65
+  wallNormalMaxUp: 0.15
+  wallMinimumSpeed: 5
+  wallForwardInput: 0.1
+  wallSpeed: 12
+  wallAcceleration: 12
+  wallGravityScale: 0.18
+  wallMaxFallSpeed: 3
+  wallAdhesion: 1.5
+  wallDuration: 1.5
+  wallDetachCooldown: 0.2
+  wallJumpOutSpeed: 6
+  wallJumpUpSpeed: 8
+  launchGroundGrace: 0.12
+  grappleEnabled: 1
+  grappleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  grappleRange: 32
+  ropeMinLength: 2
+  grappleAirAcceleration: 7
+  grappleAirSpeed: 15
+  grappleRetryDelay: 0.2
+  ropeObstructionGrace: 0.1
+  ropeContactSkin: 0.08
+  ropeAttachmentHeight: 0.55
+  cameraEffectIntensity: 0.6
+  wallRollDegrees: 6
+  cameraResponse: 8
+  speedFovStart: 10
+  speedFovFull: 25
+  speedFovBonus: 9
+  grappleFovBonus: 2
+  showRope: 1
+  ropeWidth: 0.035
+  ropeColor: {r: 0.3, g: 0.95, b: 1, a: 1}
+  ropeViewOffset: {x: 0.18, y: -0.15, z: 0.3}

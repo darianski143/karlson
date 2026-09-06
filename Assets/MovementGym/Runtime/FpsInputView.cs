@@ -11,7 +11,8 @@ namespace Jimmy.Movement
         public Vector3 spawnPosition;
         private RigidbodyMotor motor;
         private InputActionAsset actions;
-        private InputAction move, look, jump, crouch;
+        private InputAction move, look, jump, crouch, grapple;
+        private float cameraRoll;
         private float yaw, pitch;
         private bool captured;
 
@@ -23,11 +24,14 @@ namespace Jimmy.Movement
             look = actions.FindAction("Player/Look", true);
             jump = actions.FindAction("Player/Jump", true);
             crouch = actions.FindAction("Player/Crouch", true);
+            grapple = new InputAction("Grapple", InputActionType.Button);
+            grapple.AddBinding("<Mouse>/rightButton");
+            grapple.AddBinding("<Gamepad>/leftShoulder");
             yaw = transform.eulerAngles.y;
         }
-        private void OnEnable() { actions.FindActionMap("Player").Enable(); Capture(true); }
-        private void OnDisable() { actions.Disable(); motor.ClearInput(); Capture(false); }
-        private void OnDestroy() { if (actions != null) Destroy(actions); }
+        private void OnEnable() { actions.FindActionMap("Player").Enable(); grapple.Enable(); Capture(true); }
+        private void OnDisable() { actions.Disable(); grapple.Disable(); motor.ClearInput(); Capture(false); }
+        private void OnDestroy() { grapple?.Dispose(); if (actions != null) Destroy(actions); }
         private void OnApplicationFocus(bool focused) { if (!focused) { motor.ClearInput(); Capture(false); } }
         private void Capture(bool value)
         {
@@ -47,6 +51,13 @@ namespace Jimmy.Movement
             if (!captured) return;
             motor.SetInput(move.ReadValue<Vector2>(), crouch.IsPressed());
             if (jump.WasPressedThisFrame()) motor.QueueJump(Time.time);
+            var traversal = motor.Traversal;
+            if (traversal != null)
+            {
+                if (grapple.WasPressedThisFrame())
+                    traversal.TryGrapple(new Ray(playerCamera.transform.position, playerCamera.transform.forward), Time.time);
+                if (!grapple.IsPressed()) traversal.ReleaseGrapple();
+            }
             Vector2 delta = look.ReadValue<Vector2>();
             float scale = look.activeControl?.device is Gamepad ? motor.settings.gamepadLookSpeed * Time.deltaTime : motor.settings.mouseSensitivity;
             yaw += delta.x * scale;
@@ -60,8 +71,21 @@ namespace Jimmy.Movement
             Vector3 local = playerCamera.transform.localPosition;
             local.y = Mathf.Lerp(local.y, target, 1f - Mathf.Exp(-motor.settings.cameraHeightSmoothing * Time.deltaTime));
             playerCamera.transform.localPosition = local;
-            playerCamera.transform.localRotation = Quaternion.Euler(pitch, 0, 0);
-            playerCamera.fieldOfView = motor.settings.fieldOfView;
+            var traversal = motor.Traversal;
+            float targetRoll = 0, targetFov = motor.settings.fieldOfView;
+            float blend = 1f;
+            if (traversal != null && traversal.settings != null)
+            {
+                var feedback = traversal.settings;
+                targetRoll = -traversal.WallSide * feedback.wallRollDegrees * feedback.cameraEffectIntensity;
+                targetFov += (Mathf.InverseLerp(feedback.speedFovStart, feedback.speedFovFull, motor.Velocity.magnitude) *
+                    feedback.speedFovBonus + (traversal.IsGrappling ? feedback.grappleFovBonus : 0)) * feedback.cameraEffectIntensity;
+                blend = feedback.cameraEffectIntensity <= 0 ? 1f : 1f - Mathf.Exp(-feedback.cameraResponse * Time.deltaTime);
+                traversal.UpdateRope(playerCamera.transform);
+            }
+            cameraRoll = Mathf.Lerp(cameraRoll, targetRoll, blend);
+            playerCamera.transform.localRotation = Quaternion.Euler(pitch, 0, cameraRoll);
+            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFov, blend);
         }
     }
 }

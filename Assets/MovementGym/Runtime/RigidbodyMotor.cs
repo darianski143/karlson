@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Jimmy.Movement
 {
-    public enum MovementState { Airborne, Grounded, Crouching, Sliding }
+    public enum MovementState { Airborne, Grounded, Crouching, Sliding, WallRunningLeft, WallRunningRight, Grappling }
 
     // The root is at the player's feet; collision geometry grows upwards.
     [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
@@ -16,6 +16,25 @@ namespace Jimmy.Movement
         public Vector3 Velocity => body.linearVelocity;
         public float PlanarSpeed => Vector3.ProjectOnPlane(Velocity, Vector3.up).magnitude;
         public float Height => capsule.height;
+        public VerticalTraversal Traversal => GetComponent<VerticalTraversal>();
+
+        public void DetachGround(float now, float duration)
+        {
+            IsGrounded = false;
+            lastGroundedAt = float.NegativeInfinity;
+            ignoreGroundUntil = Mathf.Max(ignoreGroundUntil, now + duration);
+        }
+
+        public void Launch(Vector3 direction, float speed, float now, float groundGrace)
+        {
+            Initialize();
+            direction.Normalize();
+            Traversal?.Interrupt(now);
+            Vector3 effectiveVelocity = body.linearVelocity + pendingVelocityChange;
+            pendingVelocityChange += direction * Mathf.Max(0, speed - Vector3.Dot(effectiveVelocity, direction));
+            DetachGround(now, groundGrace);
+            jumpRequestedAt = float.NegativeInfinity;
+        }
 
         private Rigidbody body;
         private CapsuleCollider capsule;
@@ -79,6 +98,7 @@ namespace Jimmy.Movement
             moveInput = Vector2.zero;
             crouchHeld = false;
             jumpRequestedAt = float.NegativeInfinity;
+            Traversal?.Interrupt(Time.time);
         }
 
         public void Teleport(Vector3 feetPosition)
@@ -92,6 +112,7 @@ namespace Jimmy.Movement
             IsGrounded = IsCrouching = crouchWasHeld = false;
             State = MovementState.Airborne;
             ClearInput();
+            Traversal?.ResetTraversal();
             SetHeight(settings.standingHeight);
         }
 
@@ -101,7 +122,9 @@ namespace Jimmy.Movement
         public void Simulate(float dt, float now)
         {
             if (settings == null || dt <= 0) return;
+            var traversal = Traversal;
             ProbeGround(now);
+            if (traversal != null && traversal.IsGrappling) IsGrounded = false;
             if (IsGrounded) lastGroundedAt = now;
             bool wantsCrouch = crouchHeld || (IsCrouching && !CanStand());
             IsCrouching = wantsCrouch;
@@ -118,7 +141,7 @@ namespace Jimmy.Movement
             crouchWasHeld = crouchHeld;
             if (!IsGrounded || !crouchHeld) slideRemaining = 0;
 
-            bool jumping = now - jumpRequestedAt <= settings.jumpBuffer &&
+            bool jumping = (traversal == null || !traversal.IsWallRunning) && now - jumpRequestedAt <= settings.jumpBuffer &&
                            now - lastGroundedAt <= settings.coyoteTime && now >= ignoreGroundUntil;
             if (jumping)
             {
@@ -148,19 +171,26 @@ namespace Jimmy.Movement
             }
             else
             {
-                velocity = Accelerate(velocity, wish, settings.airSpeed, settings.airAcceleration, dt);
+                wish = transform.right * moveInput.x + transform.forward * moveInput.y;
+                bool grappling = traversal != null && traversal.IsGrappling;
+                velocity = Accelerate(velocity, wish,
+                    grappling ? traversal.settings.grappleAirSpeed : settings.airSpeed,
+                    grappling ? traversal.settings.grappleAirAcceleration : settings.airAcceleration, dt);
                 velocity += Vector3.down * settings.gravity * dt;
             }
 
-            body.linearVelocity = velocity + pendingVelocityChange;
+            velocity += pendingVelocityChange;
             if (Vector3.Dot(pendingVelocityChange, Vector3.up) > 0.01f)
-            {
-                IsGrounded = false;
-                lastGroundedAt = float.NegativeInfinity;
-                ignoreGroundUntil = now + 0.1f;
-            }
+                DetachGround(now, 0.1f);
             pendingVelocityChange = Vector3.zero;
-            State = !IsGrounded ? MovementState.Airborne : slideRemaining > 0 ? MovementState.Sliding :
+            if (traversal != null && traversal.Step(ref velocity, moveInput, crouchHeld,
+                now - jumpRequestedAt <= settings.jumpBuffer, IsGrounded, dt, now))
+                jumpRequestedAt = float.NegativeInfinity;
+            body.linearVelocity = velocity;
+            State = traversal != null && traversal.IsGrappling ? MovementState.Grappling :
+                traversal != null && traversal.IsWallRunning ?
+                    (traversal.WallSide < 0 ? MovementState.WallRunningLeft : MovementState.WallRunningRight) :
+                !IsGrounded ? MovementState.Airborne : slideRemaining > 0 ? MovementState.Sliding :
                 wantsCrouch ? MovementState.Crouching : MovementState.Grounded;
         }
 

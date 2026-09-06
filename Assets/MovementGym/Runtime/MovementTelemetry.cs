@@ -11,14 +11,17 @@ namespace Jimmy.Movement
         private void OnGUI()
         {
             if (!visible || motor == null) return;
-            GUI.Box(new Rect(16, 16, 440, 162), "JIMMY / MOVEMENT LAB 01");
-            GUI.Label(new Rect(30, 44, 414, 130),
-                $"Speed {motor.PlanarSpeed:F2} m/s   Vertical {motor.Velocity.y:F2} m/s\n" +
-                $"State {motor.State}   Ground {motor.IsGrounded}\n" +
-                $"Slope {Vector3.Angle(Vector3.up, motor.GroundNormal):F1} degrees\n" +
+            var traversal = motor.Traversal;
+            string extra = traversal == null ? "" :
+                $"Wall side {traversal.WallSide}   Used walls {traversal.UsedWallCount}\n" +
+                $"Rope {traversal.RopeDistance:F1}/{traversal.RopeLength:F1} m   Tangent {traversal.TangentialSpeed:F1} m/s\n";
+            GUI.Box(new Rect(16, 16, 500, 210), "JIMMY / MOVEMENT LAB 02");
+            GUI.Label(new Rect(30, 44, 476, 178),
+                $"Horizontal {motor.PlanarSpeed:F2}   Vertical {motor.Velocity.y:F2}   Total {motor.Velocity.magnitude:F2} m/s\n" +
+                $"State {motor.State}   Ground {motor.IsGrounded}\n" + extra +
                 "WASD / stick: move | mouse / stick: look | Space / A: jump\n" +
-                "C / Ctrl / B: crouch + slide | R: reset | F3: telemetry\n" +
-                "Esc: release cursor | click: capture");
+                "C / Ctrl / B: crouch + slide | RMB / LB: hold grapple\n" +
+                "R: reset | F3: telemetry | Esc: release cursor | click: capture");
             GUI.Label(new Rect(Screen.width / 2f - 4, Screen.height / 2f - 10, 20, 20), "+");
         }
     }
