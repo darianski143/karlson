@@ -1,0 +1,1 @@
+{"name":"CombatGym.Tests","references":["CombatGym.Runtime","CombatGym.Editor","MovementGym.Runtime","MovementGym.Editor","Unity.InputSystem"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}

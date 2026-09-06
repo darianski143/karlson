@@ -179,13 +179,17 @@ namespace Jimmy.Movement
                 velocity += Vector3.down * settings.gravity * dt;
             }
 
-            velocity += pendingVelocityChange;
             if (Vector3.Dot(pendingVelocityChange, Vector3.up) > 0.01f)
                 DetachGround(now, 0.1f);
-            pendingVelocityChange = Vector3.zero;
             if (traversal != null && traversal.Step(ref velocity, moveInput, crouchHeld,
                 now - jumpRequestedAt <= settings.jumpBuffer, IsGrounded, dt, now))
                 jumpRequestedAt = float.NegativeInfinity;
+            // Apply external impulses after wall locomotion, including on its entry tick.
+            // The rope is the final physical constraint and still limits radial motion.
+            traversal?.NotifyExternalImpulse(pendingVelocityChange, now);
+            velocity += pendingVelocityChange;
+            pendingVelocityChange = Vector3.zero;
+            if (traversal != null) velocity = traversal.ConstrainFinalVelocity(velocity, dt);
             body.linearVelocity = velocity;
             State = traversal != null && traversal.IsGrappling ? MovementState.Grappling :
                 traversal != null && traversal.IsWallRunning ?

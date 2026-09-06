@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b78cf67250d581b46ae1623b6d3c538d, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: CombatGym.Runtime::Jimmy.Combat.WeaponDefinition
+  kind: 0
+  displayName: Pistol
+  damage: 40
+  shotInterval: 0.3
+  range: 100
+  pellets: 1
+  spreadDegrees: 0
+  targetImpulse: 3
+  playerRecoil: 0.25
+  viewKick: 0.8
+  projectileSpeed: 20
+  inheritVelocity: 0.6
+  projectileGravity: 20
+  projectileRadius: 0.15
+  spawnDistance: 0.6
+  fuse: 1.3
+  armingDelay: 0.08
+  explodeOnImpact: 0
+  explosion: {fileID: 0}
+  projectileMaterial: {fileID: 0}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295

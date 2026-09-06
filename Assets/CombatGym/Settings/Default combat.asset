@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6edbbf4e3a637014db3c295a2b376137, type: 3}
+  m_Name: Default combat
+  m_EditorClassIdentifier: CombatGym.Runtime::Jimmy.Combat.CombatTuning
+  weapons:
+  - {fileID: 11400000, guid: b9f3fc41ab1851f4a8749e5533a9dcef, type: 2}
+  - {fileID: 11400000, guid: 6a755f06441757f4b83ccad8e7911ae2, type: 2}
+  - {fileID: 11400000, guid: 70f5e8374818871408ccbc8e0638ddbf, type: 2}
+  unlockAll: 0
+  cameraIntensity: 0.5
+  cameraRecovery: 12
+  maximumViewKick: 4
+  shakeDegrees: 0.25
+  shakeFrequency: 24
+  hitConfirmDuration: 0.18
+  muzzleDuration: 0.045
+  tracerDuration: 0.09
+  tracerWidth: 0.025
+  impactDuration: 0.3
+  impactSize: 0.12
+  explosionFlashDuration: 0.12
+  maximumEffects: 64
+  spectacleSpeed: 14
+  tracerMaterial: {fileID: 2100000, guid: 831910ae4a546d34c927cd3f78939982, type: 2}
+  impactMaterial: {fileID: 2100000, guid: 831910ae4a546d34c927cd3f78939982, type: 2}
+  explosionMaterial: {fileID: 2100000, guid: 831910ae4a546d34c927cd3f78939982, type: 2}
+  telemetry: 1

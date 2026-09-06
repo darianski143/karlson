@@ -1,0 +1,1 @@
+{"name":"CombatGym.Runtime","rootNamespace":"Jimmy.Combat","references":["MovementGym.Runtime","Unity.InputSystem"]}

@@ -28,7 +28,7 @@ The route builder is **Jimmy > Movement Gym > Add Vertical Traversal**. It appen
 
 Camera effects are deliberately modest. Set **cameraEffectIntensity = 0** to disable roll and all FOV changes immediately; lower values scale every effect. Wall roll, speed FOV and grapple FOV also have separate amplitudes. `showRope` independently controls the visible tether. There is no camera shake.
 
-`RigidbodyMotor` remains the only component writing locomotion velocity. It calls `VerticalTraversal.Step` after base locomotion and queued external impulses. Wall jumps consume buffered jump input. `Launch` preserves perpendicular velocity, interrupts the grapple/wall-run, and prevents ground adhesion from swallowing the launch. Disabling traversal or respawning clears active attachments.
+`RigidbodyMotor` remains the only component writing locomotion velocity. With Milestone 3, it calls `VerticalTraversal.Step` after base locomotion, applies queued external impulses after wall control, then applies the rope constraint last so combat recoil is preserved. See [CombatPhysics.md](CombatPhysics.md). Wall jumps consume buffered jump input. `Launch` preserves perpendicular velocity, interrupts the grapple/wall-run, and prevents ground adhesion from swallowing the launch. Disabling traversal or respawning clears active attachments.
 
 Wall identities are retained in a set until actual ground detection or respawn: leaving a wall, waiting, grappling, or touching a different wall does not restore the first wall. A short detach cooldown prevents immediate switching. Put `WallSurface` on a shared parent to make several collider segments count as one wall.
 

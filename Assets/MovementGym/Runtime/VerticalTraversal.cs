@@ -60,6 +60,13 @@ namespace Jimmy.Movement
             ReleaseGrapple();
         }
 
+        public void NotifyExternalImpulse(Vector3 impulse, float now)
+        {
+            // An outward combat impulse must not be erased by wall adhesion.
+            // The grapple still constrains its radial component naturally.
+            if (IsWallRunning && (Vector3.Dot(impulse, WallNormal) > 0.001f || impulse.y < -0.001f)) EndWall(now);
+        }
+
         public bool DetectWall(int side, out RaycastHit result)
         {
             result = default;
@@ -107,8 +114,6 @@ namespace Jimmy.Movement
                     if (obstructionTime > settings.ropeObstructionGrace) ReleaseGrapple();
                     else
                     {
-                        velocity = ConstrainVelocity(Body.position + ropeStartOffset,
-                            AnchorPoint, RopeLength, velocity, dt);
                         return false;
                     }
                 }
@@ -220,6 +225,12 @@ namespace Jimmy.Movement
             for (int i = 0; i < count; i++)
                 if (hits[i].collider.attachedRigidbody != Body && hits[i].collider != anchorCollider) return true;
             return false;
+        }
+
+        public Vector3 ConstrainFinalVelocity(Vector3 velocity, float dt)
+        {
+            return IsGrappling && settings != null ?
+                ConstrainVelocity(Body.position + ropeStartOffset, AnchorPoint, RopeLength, velocity, dt) : velocity;
         }
 
         public void ReleaseGrapple()

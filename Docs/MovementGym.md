@@ -1,6 +1,6 @@
 # Milestone 1 — Movement Gym
 
-Milestone 2 adds vertical traversal to this gym; see [VerticalTraversal.md](VerticalTraversal.md) for the new controls, routes and tuning.
+Milestone 2 adds vertical traversal; see [VerticalTraversal.md](VerticalTraversal.md). Milestone 3 adds Combat Gym, weapons and destructibles; see [CombatPhysics.md](CombatPhysics.md) for controls, tuning and validation.
 
 Original greybox and controller for JIMMY. No KARLSON code or assets are used.
 

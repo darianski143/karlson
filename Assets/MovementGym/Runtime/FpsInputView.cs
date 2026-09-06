@@ -9,6 +9,8 @@ namespace Jimmy.Movement
         public InputActionAsset inputActions;
         public Camera playerCamera;
         public Vector3 spawnPosition;
+        public InputActionAsset ActiveActions => actions;
+        public bool InputCaptured => captured;
         private RigidbodyMotor motor;
         private InputActionAsset actions;
         private InputAction move, look, jump, crouch, grapple;

@@ -1,0 +1,1 @@
+{"name":"CombatGym.Editor","rootNamespace":"Jimmy.Combat.Editor","references":["CombatGym.Runtime","MovementGym.Runtime","MovementGym.Editor"],"includePlatforms":["Editor"]}

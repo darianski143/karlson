@@ -22,7 +22,7 @@ namespace Jimmy.Movement
                 "WASD / stick: move | mouse / stick: look | Space / A: jump\n" +
                 "C / Ctrl / B: crouch + slide | RMB / LB: hold grapple\n" +
                 "R: reset | F3: telemetry | Esc: release cursor | click: capture");
-            GUI.Label(new Rect(Screen.width / 2f - 4, Screen.height / 2f - 10, 20, 20), "+");
+
         }
     }
 }
