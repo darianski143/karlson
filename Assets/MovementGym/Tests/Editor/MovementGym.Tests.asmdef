@@ -1,0 +1,6 @@
+{
+  "name": "MovementGym.Tests",
+  "references": ["MovementGym.Runtime", "MovementGym.Editor", "Unity.InputSystem"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

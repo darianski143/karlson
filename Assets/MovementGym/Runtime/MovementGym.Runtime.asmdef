@@ -1,0 +1,5 @@
+{
+  "name": "MovementGym.Runtime",
+  "rootNamespace": "Jimmy.Movement",
+  "references": ["Unity.InputSystem"]
+}

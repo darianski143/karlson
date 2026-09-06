@@ -1,0 +1,6 @@
+{
+  "name": "MovementGym.Editor",
+  "rootNamespace": "Jimmy.Movement.Editor",
+  "references": ["MovementGym.Runtime", "Unity.InputSystem"],
+  "includePlatforms": ["Editor"]
+}
