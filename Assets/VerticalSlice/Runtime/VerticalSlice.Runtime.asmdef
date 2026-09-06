@@ -1,0 +1,1 @@
+{"name":"VerticalSlice.Runtime","rootNamespace":"Jimmy.Run","references":["MovementGym.Runtime","CombatGym.Runtime","Unity.InputSystem"]}

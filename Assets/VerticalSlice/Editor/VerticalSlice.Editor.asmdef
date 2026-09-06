@@ -1,0 +1,1 @@
+{"name":"VerticalSlice.Editor","rootNamespace":"Jimmy.Run.Editor","references":["VerticalSlice.Runtime","MovementGym.Runtime","CombatGym.Runtime"],"includePlatforms":["Editor"]}

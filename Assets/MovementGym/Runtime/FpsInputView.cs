@@ -10,7 +10,11 @@ namespace Jimmy.Movement
         public Camera playerCamera;
         public Vector3 spawnPosition;
         public InputActionAsset ActiveActions => actions;
-        public bool InputCaptured => captured;
+        public bool InputCaptured => captured && !waitingForNeutral;
+        public bool WaitingForNeutral => waitingForNeutral;
+        public bool externalRespawnControl;
+        public bool requireNeutralOnEnable;
+        private bool waitingForNeutral;
         private RigidbodyMotor motor;
         private InputActionAsset actions;
         private InputAction move, look, jump, crouch, grapple;
@@ -31,7 +35,7 @@ namespace Jimmy.Movement
             grapple.AddBinding("<Gamepad>/leftShoulder");
             yaw = transform.eulerAngles.y;
         }
-        private void OnEnable() { actions.FindActionMap("Player").Enable(); grapple.Enable(); Capture(true); }
+        private void OnEnable() { actions.FindActionMap("Player").Enable(); grapple.Enable(); waitingForNeutral = requireNeutralOnEnable; Capture(true); }
         private void OnDisable() { actions.Disable(); grapple.Disable(); motor.ClearInput(); Capture(false); }
         private void OnDestroy() { grapple?.Dispose(); if (actions != null) Destroy(actions); }
         private void OnApplicationFocus(bool focused) { if (!focused) { motor.ClearInput(); Capture(false); } }
@@ -45,12 +49,19 @@ namespace Jimmy.Movement
         {
             if (Keyboard.current?.escapeKey.wasPressedThisFrame == true) { Capture(false); motor.ClearInput(); }
             else if (!captured && Mouse.current?.leftButton.wasPressedThisFrame == true) Capture(true);
-            if (transform.position.y < -12 || (captured && Keyboard.current?.rKey.wasPressedThisFrame == true))
+            if (!externalRespawnControl && (transform.position.y < -12 || (captured && Keyboard.current?.rKey.wasPressedThisFrame == true)))
             {
                 motor.Teleport(spawnPosition);
                 yaw = pitch = 0;
             }
             if (!captured) return;
+            if (waitingForNeutral)
+            {
+                if (ButtonHeld(jump) || ButtonHeld(crouch) || ButtonHeld(grapple) ||
+                    ButtonHeld(actions.FindAction("Player/Attack")))
+                { motor.SetInput(Vector2.zero, false); return; }
+                waitingForNeutral = false;
+            }
             motor.SetInput(move.ReadValue<Vector2>(), crouch.IsPressed());
             if (jump.WasPressedThisFrame()) motor.QueueJump(Time.time);
             var traversal = motor.Traversal;
@@ -66,6 +77,14 @@ namespace Jimmy.Movement
             pitch = Mathf.Clamp(pitch - delta.y * scale, -88f, 88f);
             // Rotation is yaw only; Rigidbody translation remains physics-owned.
             transform.rotation = Quaternion.Euler(0, yaw, 0);
+        }
+        // Fresh Button actions need not report a press already held before enable.
+        // Read their resolved controls so a scene restart cannot bypass the neutral gate.
+        private static bool ButtonHeld(InputAction action)
+        {
+            foreach (var control in action.controls)
+                if (control is UnityEngine.InputSystem.Controls.ButtonControl button && button.isPressed) return true;
+            return false;
         }
         private void LateUpdate()
         {

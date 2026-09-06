@@ -1,0 +1,1 @@
+{"name":"VerticalSlice.Tests","references":["VerticalSlice.Runtime","VerticalSlice.Editor","MovementGym.Runtime","CombatGym.Runtime","Unity.InputSystem"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}
